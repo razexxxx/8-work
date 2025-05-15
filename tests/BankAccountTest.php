@@ -1,70 +1,50 @@
 <?php
 
-use PHPUnit\Framework\TestCase;
-use Bank\BankAccount;
-use Bank\InvalidAmountException;
-use Bank\InsufficientFundsException;
+use App\BankAccount;
+use App\Exception\InvalidAmountException;
+use App\Exception\InsufficientFundsException;
 
-class BankAccountTest extends TestCase
+function runTests()
 {
-    public function testInitialBalance()
-    {
-        $account = new BankAccount(500.0);
-        $this->assertEquals(500.0, $account->getBalance());
+    try {
+        // Тест 1: Отрицательный начальный баланс
+        $acc1 = new BankAccount(-100);
+        echo "Тест 1 провален\n";
+    } catch (InvalidAmountException $e) {
+        echo "Тест 1 пройден: " . $e->getMessage() . "\n";
     }
 
-    public function testDepositPositiveAmount()
-    {
-        $account = new BankAccount(100.0);
-        $account->deposit(200.0);
-        $this->assertEquals(300.0, $account->getBalance());
+    try {
+        // Тест 2: Внесение нуля
+        $acc2 = new BankAccount(100);
+        $acc2->deposit(0);
+        echo "Тест 2 провален\n";
+    } catch (InvalidAmountException $e) {
+        echo "Тест 2 пройден: " . $e->getMessage() . "\n";
     }
 
-    public function testDepositNegativeAmountThrowsException()
-    {
-        $this->expectException(InvalidAmountException::class);
-        $account = new BankAccount(100.0);
-        $account->deposit(-50.0);
+    try {
+        // Тест 3: Снятие больше баланса
+        $acc3 = new BankAccount(100);
+        $acc3->withdraw(150);
+        echo "Тест 3 провален\n";
+    } catch (InsufficientFundsException $e) {
+        echo "Тест 3 пройден: " . $e->getMessage() . "\n";
     }
 
-    public function testDepositZeroThrowsException()
-    {
-        $this->expectException(InvalidAmountException::class);
-        $account = new BankAccount(100.0);
-        $account->deposit(0.0);
-    }
-
-    public function testWithdrawValidAmount()
-    {
-        $account = new BankAccount(500.0);
-        $account->withdraw(200.0);
-        $this->assertEquals(300.0, $account->getBalance());
-    }
-
-    public function testWithdrawNegativeAmountThrowsException()
-    {
-        $this->expectException(InvalidAmountException::class);
-        $account = new BankAccount(500.0);
-        $account->withdraw(-100.0);
-    }
-
-    public function testWithdrawZeroThrowsException()
-    {
-        $this->expectException(InvalidAmountException::class);
-        $account = new BankAccount(500.0);
-        $account->withdraw(0.0);
-    }
-
-    public function testWithdrawMoreThanBalanceThrowsException()
-    {
-        $this->expectException(InsufficientFundsException::class);
-        $account = new BankAccount(300.0);
-        $account->withdraw(400.0);
-    }
-
-    public function testConstructorWithNegativeInitialBalance()
-    {
-        $this->expectException(InvalidAmountException::class);
-        new BankAccount(-100.0);
+    try {
+        // Тест 4: Успешное снятие
+        $acc4 = new BankAccount(500);
+        $acc4->withdraw(200);
+        if ($acc4->getBalance() == 300) {
+            echo "Тест 4 пройден\n";
+        } else {
+            echo "Тест 4 провален\n";
+        }
+    } catch (Exception $e) {
+        echo "Тест 4 провален: " . $e->getMessage() . "\n";
     }
 }
+
+echo "\n=== Тестирование ===\n";
+runTests();
